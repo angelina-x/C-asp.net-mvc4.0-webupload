@@ -1,0 +1,270 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="~/Script/jquery-1.10.2.min.js"></script>
+    <link href="~/CSS/webuploader.css" rel="stylesheet" />
+    <script src="~/Script/webuploader.js"></script>
+    <script src="~/easyui/jquery.easyui.min.js" type="text/javascript"></script>
+    <script src="~/easyui/locale/easyui-lang-en.js" type="text/javascript"></script>
+    <link href="~/easyui/themes/default/easyui.css" rel="stylesheet" type="text/css" />
+    <link href="~/easyui/themes/icon.css" rel="stylesheet" type="text/css" />
+    <link href="~/CSS/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/CSS/style.css" rel="stylesheet" />
+    @*<link href="~/CSS/demo.css" rel="stylesheet" />*@
+    <link href="~/CSS/font-awesome.css" rel="stylesheet" />
+    @*<link rel="shortcut icon" href="~/Images/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="~/Images/favicon.ico" type="image/x-icon" />*@
+
+</head>
+<body>
+    <div id="headerBlock" style="width:100%;height:270px;position:relative;">
+        <div id="header1" style="width:800px;position:absolute">
+            <img id="img1" src="~/Images/header3.png" />
+        </div>
+
+        <div id="header2" style="width:800px;height:35px;position:absolute">
+        </div>
+
+    </div>
+    <div>
+        <table class="tc_table_cp" border="0">
+            <tr>
+                <td width="104">图片上传：</td>
+                <td colspan="3">
+                    <div id="fileList">
+
+                    </div>
+                    <div class="cp_img_jia" id="filePicker"></div>
+                </td>
+            </tr>
+            <tr>
+                <td width="104"></td>
+                <td colspan="3">
+                    <button id="ctlBtn" class="btn btn-default">开始上传</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div style="width:100%;height:35px;"></div>
+    <div id="d1">
+        <div id="d2" style="width:800px;height:620px;">
+            <table id="tab_list" class="easyui-datagrid" style="width:800px;height:600px;">
+                <thead>
+                    <tr>
+                        <th field="JSON_file" style="width: 30%">Picture</th>
+                        <th field="JSON_size" style="width: 15%">Size</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
+<style type="text/css">
+    #d1{
+        position:relative;
+    }
+    #d2{
+        position:absolute;
+    }
+    #img1{
+        width:auto;
+        height:auto;
+        max-width:100%;
+        max-height:100%;
+    }
+</style>
+
+<script type="text/javascript">
+    
+
+    var applicationPath = window.applicationPath === "" ? "" : window.applicationPath || "../../";
+    var urlUpload = location.href + 'Home/LoadData';
+    var question = applicationPath + 'Home/UpLoadProcess';
+    //function(){
+    //initUploadConfig();
+    //}
+    $(function() {
+        initUploadConfig();
+        
+        InitGird();
+
+        widthFix();
+    });
+
+    function widthFix() {
+        var width = document.body.clientWidth;
+        var offsetWidth = width /6;
+        $("#d2").css("margin-left", offsetWidth + "px");
+        $("#header1").css("margin-left", offsetWidth + "px");
+        //var imgHeight = $("#header1").css("height") + 30;
+        //$("#headerBlock").css("height", imgHeight+"px");
+    }
+
+    function InitGird() {
+        $('#tab_list').datagrid({
+            title: '合格产品', //title
+            url: location.href+'/Home/LoadData',
+            sortName: 'JSON_file',
+            idField: 'JSON_file', //KEY
+            iconCls: ' ',//标题左边的图标icon-reload
+            width: '50%',
+            fit: true,
+            //height: $(parent.document).find("#mainPanle").height() - 65 > 0 ? $(parent.document).find("#mainPanle").height() - 65 : 1000, // 'auto'高度$(parent.document).find("#mainPanle").height() - 50 > 0 ? $(parent.document).find("#mainPanle").height() - 50 : 500
+            nowrap: false,//是否换行，True 就会把数据显示在一行里
+            striped: true,//True 奇偶行使用不同背景色
+            collapsible: true,//可折叠
+            //sortOrder: 'desc',
+            remoteSort: true,//定义是否从服务器给数据排序
+            singleSelect: true,
+            toolbar: "#toolbar",
+            queryParams: { "action": "query" },
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 20,
+            rownumbers: true
+        });
+    }
+
+    function initUploadConfig() {
+        var $ = jQuery,
+        $list = $('#fileList'),
+        // 优化retina, 在retina下这个值是2
+        ratio = window.devicePixelRatio || 1,
+        // 缩略图大小
+        thumbnailWidth = 90 * ratio,
+        thumbnailHeight = 90 * ratio,
+
+        // Web Uploader实例
+        uploader;
+        uploader = WebUploader.create({
+            // 选完文件后，是否自动上传。
+            auto: false,
+
+            disableGlobalDnd: true,
+            // swf文件路径
+            swf: applicationPath + '/Script/Uploader.swf',
+
+            // 文件接收服务端。
+            server: location.href + '/Home/UpLoadProcess',  // applicationPath + '/Home/UpLoadProcess',
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#filePicker',
+
+            //只允许选择图片
+            accept: {
+                title: 'Images',
+                extensions: 'gif,jpg,jpeg,bmp,png',
+                mimeTypes: 'image/*'
+            }
+        });
+
+
+
+        // 当有文件添加进来的时候
+        uploader.on('fileQueued', function (file) {
+            var $li = $(
+                    '<div id="' + file.id + '" class="cp_img">' +
+                        '<img>' +
+                    '<div class="cp_img_jian"></div></div>'
+                    ),
+                $img = $li.find('img');
+
+
+            // $list为容器jQuery实例
+            $list.append($li);
+
+            // 创建缩略图
+            // 如果为非图片文件，可以不用调用此方法。
+            // thumbnailWidth x thumbnailHeight 为 100 x 100
+            uploader.makeThumb(file, function (error, src) {
+                if (error) {
+                    $img.replaceWith('<span>不能预览</span>');
+                    return;
+                }
+
+                $img.attr('src', src);
+            }, thumbnailWidth, thumbnailHeight);
+        });
+
+        // 文件上传过程中创建进度条实时显示。
+        uploader.on('uploadProgress', function (file, percentage) {
+            var $li = $('#' + file.id),
+                $percent = $li.find('.progress span');
+
+            // 避免重复创建
+            if (!$percent.length) {
+                $percent = $('<p class="progress"><span></span></p>')
+                        .appendTo($li)
+                        .find('span');
+            }
+
+            $percent.css('width', percentage * 100 + '%');
+        });
+
+        // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+        uploader.on('uploadSuccess', function (file, response) {
+
+            $('#' + file.id).addClass('upload-state-done');
+        });
+
+        // 文件上传失败，显示上传出错。
+        uploader.on('uploadError', function (file) {
+            var $li = $('#' + file.id),
+                $error = $li.find('div.error');
+
+            // 避免重复创建
+            if (!$error.length) {
+                $error = $('<div class="error"></div>').appendTo($li);
+            }
+
+            $error.text('上传失败');
+        });
+
+        // 完成上传完了，成功或者失败，先删除进度条。
+        uploader.on('uploadComplete', function (file) {
+            $('#' + file.id).find('.progress').remove();
+        });
+
+        //所有文件上传完毕
+        uploader.on("uploadFinished", function () {
+            //提交表单
+
+            alert("全部上传完成！");
+
+        });
+
+        //开始上传
+        $("#ctlBtn").click(function () {
+            uploader.upload();
+        });
+
+        //显示删除按钮
+        $(document).on("mouseover", ".cp_img", function () {
+            $(this).children(".cp_img_jian").css('display', 'block');
+
+        });
+        //隐藏删除按钮
+        $(document).on("mouseout", ".cp_img", function () {
+            $(this).children(".cp_img_jian").css('display', 'none');
+
+        });
+        //执行删除方法
+        $list.on("click", ".cp_img_jian", function () {
+            var Id = $(this).parent().attr("id");
+            uploader.removeFile(uploader.getFile(Id, true));
+            $(this).parent().remove();
+        });
+
+    }
+</script>
+
